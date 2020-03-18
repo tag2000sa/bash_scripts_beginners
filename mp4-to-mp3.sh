@@ -16,12 +16,18 @@ fi
 for file in "$@"
 do
     temp_filename=$(echo $file|sed 's/ /_/g') # set a temporary file name
-    mv -T "$file" $temp_filename # change file name temporarly
+    if [ "$file" != $temp_filename ]
+    then
+        mv -T "$file" $temp_filename # change file name temporarly
+    fi
     newFile_name=$(echo $temp_filename|sed "s/.mp4/.mp3/") # extract file name 
 	## convert .mp4 to .mp3
     ffmpeg -i $temp_filename -vn \
            -acodec libmp3lame -ac 2 -qscale:a 4 -ar 48000 -loglevel -8\
             $newFile_name 
-    mv -T $temp_filename "$file" # restore original file name
+    if [ "$file" != $temp_filename ]
+    then
+        mv -T $temp_filename "$file" # restore original file name
+    fi
 	echo -e "$file -> $newFile_name"
 done
